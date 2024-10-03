@@ -11,6 +11,15 @@ import {
 import { FormValues, StudentSearchModalProps } from "./StudentSearchModal.interface";
 import { useStyles } from "./StudentSearchModal.styles";
 
+const StudentItem = ({ label, email, ...others }: { label: string; email: string }) => (
+  <div {...others}>
+    <Text size="sm">{label}</Text>
+    <Text size="xs" color="dimmed">
+      {email}
+    </Text>
+  </div>
+);
+
 const StudentSearchModal: React.FC<StudentSearchModalProps> = ({
   isOpen,
   onClose,
@@ -59,6 +68,7 @@ const StudentSearchModal: React.FC<StudentSearchModalProps> = ({
     unenrolledStudents?.map((student) => ({
       label: `${student.user.firstName} ${student.user.lastName}`,
       value: String(student.id),
+      email: student.user.email,
     })) || [];
 
   return (
@@ -71,7 +81,7 @@ const StudentSearchModal: React.FC<StudentSearchModalProps> = ({
         <form onSubmit={handleSubmit(onSubmit)}>
           <SimpleGrid>
             <Select
-              label="Type a name"
+              label="Type a name or email"
               placeholder="Pick student"
               data={studentOptions}
               searchable
@@ -82,6 +92,11 @@ const StudentSearchModal: React.FC<StudentSearchModalProps> = ({
               dropdownPosition="bottom"
               withinPortal
               maxDropdownHeight={200}
+              itemComponent={StudentItem}
+              filter={(value, item) =>
+                item.label?.toLowerCase().includes(value.toLowerCase().trim()) ||
+                item["email"]?.toLowerCase().includes(value.toLowerCase().trim())
+              }
               classNames={{
                 dropdown: classes.dropdown,
                 input: classes.input,
@@ -115,5 +130,4 @@ const StudentSearchModal: React.FC<StudentSearchModalProps> = ({
     </Modal>
   );
 };
-
 export default StudentSearchModal;
